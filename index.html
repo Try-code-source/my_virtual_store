@@ -90,14 +90,13 @@
             transform: translateY(-5px);
         }
 
-        .product-image {
+        .product-img {
             width: 100%;
             height: 200px;
-            background-color: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #777;
+            object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: block;
         }
 
         .product-info {
@@ -159,7 +158,7 @@
     <main class="products-container">
         <!-- Prodotto 1 -->
         <div class="product-card">
-            <img src ="cuffie.jpg" alt ="Cuffie Wireless Pro" class ="product-img">
+            <img src="cuffie.jpg" alt="Cuffie Wireless Pro" class="product-img">
             <div class="product-info">
                 <h2 class="product-title">Cuffie Wireless Pro</h2>
                 <div class="product-price">€ 129.99</div>
@@ -169,7 +168,7 @@
 
         <!-- Prodotto 2 -->
         <div class="product-card">
-            <div class="product-image">Immagine Prodotto</div>
+            <img src="smartwatch.jpg" alt="Smartwatch Sport" class="product-img">
             <div class="product-info">
                 <h2 class="product-title">Smartwatch Sport</h2>
                 <div class="product-price">€ 199.50</div>
@@ -179,7 +178,7 @@
 
         <!-- Prodotto 3 -->
         <div class="product-card">
-            <div class="product-image">Immagine Prodotto</div>
+            <img src="speaker.jpg" alt="Altoparlante Bluetooth" class="product-img">
             <div class="product-info">
                 <h2 class="product-title">Altoparlante Bluetooth</h2>
                 <div class="product-price">€ 79.00</div>
@@ -225,7 +224,7 @@
             sendTracking('PageView');
         });
 
-        // Traccia quando l'utente lascia la pagina registrando la durata della sessione
+        // Traccia quando l'utente lascia la pagina
         window.addEventListener('beforeunload', () => {
             sendTracking('PageLeave');
         });
@@ -246,4 +245,3 @@
 
 </body>
 </html>
-
