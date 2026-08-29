@@ -157,7 +157,6 @@
     </section>
 
     <main class="products-container">
-        <!-- Prodotto 1 -->
         <div class="product-card">
             <div class="product-image">Immagine Prodotto</div>
             <div class="product-info">
@@ -167,7 +166,6 @@
             </div>
         </div>
 
-        <!-- Prodotto 2 -->
         <div class="product-card">
             <div class="product-image">Immagine Prodotto</div>
             <div class="product-info">
@@ -177,7 +175,6 @@
             </div>
         </div>
 
-        <!-- Prodotto 3 -->
         <div class="product-card">
             <div class="product-image">Immagine Prodotto</div>
             <div class="product-info">
@@ -192,36 +189,43 @@
         <p>&copy; 2026 TechStore. Tutti i diritti riservati.</p>
     </footer>
 
-    <!-- LOGICA JAVASCRIPT E TRACKING -->
     <script>
-        // Sostituisci il testo tra le virgolette con il tuo URL di Google Apps Script (che finisce per /exec)
-        const TRACKING_URL = 'INCOLLA_QUI_IL_TUO_URL_DI_GOOGLE_APPS_SCRIPT';
+        const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzDjpCzNVOBag47uzFnb8AH_rYQ-Vkz3J7xQY_5L3HkfyMqyoLVo4D_V3Bd3HBcVgqoow/exec';
 
         let cart = [];
         let total = 0;
+        let startTime = Date.now();
 
-        // Funzione per inviare i dati a Google Sheets
-        function sendTracking(eventName, detail = '', price = '') {
-            if (!TRACKING_URL || TRACKING_URL.includes('INCOLLA_QUI')) return;
+        // Genera un ID utente casuale per la sessione
+        let userId = 'USR-' + Math.random().toString(36).substring(2, 9);
+
+        function sendTracking(eventName, productName = '', productPrice = '') {
+            let sessionDuration = Math.round((Date.now() - startTime) / 1000) + 's';
 
             fetch(TRACKING_URL, {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
+                    userId: userId,
                     event: eventName,
-                    detail: detail,
-                    price: price
+                    productName: productName,
+                    productPrice: productPrice,
+                    sessionDuration: sessionDuration
                 })
             }).catch(err => console.error('Errore tracking:', err));
         }
 
-        // Registra automaticamente la visita della pagina all'apertura
+        // Traccia la visita appena si carica la pagina
         window.addEventListener('DOMContentLoaded', () => {
-            sendTracking('Visita Pagina', window.location.href);
+            sendTracking('PageView');
         });
 
-        // Gestione Aggiunta al Carrello + Tracciamento
+        // Traccia quando l'utente lascia la pagina registrando la durata della sessione
+        window.addEventListener('beforeunload', () => {
+            sendTracking('PageLeave');
+        });
+
         function addToCart(productName, price) {
             cart.push({ name: productName, price: price });
             total += price;
@@ -229,8 +233,8 @@
             document.getElementById('cart-count').innerText = cart.length;
             document.getElementById('cart-total').innerText = total.toFixed(2);
 
-            // Invia l'evento "Aggiunta al Carrello" a Google Sheets
-            sendTracking('Aggiunta al Carrello', productName, price);
+            // Invia i dati al foglio Google
+            sendTracking('AddToCart', productName, price);
 
             alert(`"${productName}" è stato aggiunto al carrello!`);
         }
