@@ -277,4 +277,17 @@
             alert(`"${productName}" è stato aggiunto al carrello!`);
         }
 
-        /*
+        /* --- FUNZIONE APERTURA GALLERIA "SIMILAR PRODUCTS" --- */
+        function openSimilarProducts() {
+            sendTracking('ViewSimilarProducts', 'Smartwatch Sport');
+            
+            Fancybox.show([
+                { src: "smartwatch.jpg", caption: "Smartwatch Sport - Modello Base" },
+                { src: "smartwatch_2.jpg", caption: "Smartwatch Sport - Variante 2" },
+                { src: "smartwatch_3.jpg", caption: "Smartwatch Sport - Variante 3" }
+            ]);
+        }
+    </script>
+
+</body>
+</html>
