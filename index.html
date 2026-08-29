@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Virtuale - Offerte Esclusive</title>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
+
     <style>
         /* --- RESET E STILI BASE --- */
         * {
@@ -118,9 +121,10 @@
             margin-bottom: 1rem;
         }
 
-        /* --- PULSANTE SPECIFICHE TECNICHE --- */
-        .btn-details {
+        /* --- PULSANTI SPECIFICHE TECNICHE E SIMILAR PRODUCTS --- */
+        .btn-details, .btn-similar {
             display: block;
+            width: 100%;
             text-align: center;
             background-color: #ffffff;
             color: #2c3e50;
@@ -132,9 +136,10 @@
             text-decoration: none;
             margin-bottom: 0.6rem;
             transition: all 0.2s ease;
+            cursor: pointer;
         }
 
-        .btn-details:hover {
+        .btn-details:hover, .btn-similar:hover {
             background-color: #2c3e50;
             color: #ffffff;
         }
@@ -195,11 +200,15 @@
                 <h2 class="product-title">Smartwatch Sport</h2>
                 <div class="product-price">€ 199.50</div>
                 
+                <button type="button" class="btn-similar" onclick="openSimilarProducts()">
+                    🖼️ Similar products
+                </button>
+
                 <a href="https://www.sectornolimits.com/orologio-sector-s-07-r3253552001-P52835.htm" 
                    target="_blank" 
                    rel="noopener noreferrer" 
                    class="btn-details">
-                   📋 Specifiche Tecniche
+                    📋 Specifiche Tecniche
                 </a>
                 
                 <button class="btn-add-cart" onclick="addToCart('Smartwatch Sport', 199.50)">Aggiungi al Carrello</button>
@@ -219,6 +228,8 @@
     <footer>
         <p>&copy; 2026 TechStore. Tutti i diritti riservati.</p>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 
     <script>
         const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzDjpCzNVOBag47uzFnb8AH_rYQ-Vkz3J7xQY_5L3HkfyMqyoLVo4D_V3Bd3HBcVgqoow/exec';
@@ -265,7 +276,5 @@
 
             alert(`"${productName}" è stato aggiunto al carrello!`);
         }
-    </script>
 
-</body>
-</html>
+        /*
