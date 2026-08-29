@@ -157,6 +157,7 @@
     </section>
 
     <main class="products-container">
+        <!-- Prodotto 1 -->
         <div class="product-card">
             <div class="product-image">Immagine Prodotto</div>
             <div class="product-info">
@@ -166,6 +167,7 @@
             </div>
         </div>
 
+        <!-- Prodotto 2 -->
         <div class="product-card">
             <div class="product-image">Immagine Prodotto</div>
             <div class="product-info">
@@ -175,6 +177,7 @@
             </div>
         </div>
 
+        <!-- Prodotto 3 -->
         <div class="product-card">
             <div class="product-image">Immagine Prodotto</div>
             <div class="product-info">
@@ -189,23 +192,46 @@
         <p>&copy; 2026 TechStore. Tutti i diritti riservati.</p>
     </footer>
 
+    <!-- LOGICA JAVASCRIPT E TRACKING -->
     <script>
-        // Stato del carrello
+        // Sostituisci il testo tra le virgolette con il tuo URL di Google Apps Script (che finisce per /exec)
+        const TRACKING_URL = 'INCOLLA_QUI_IL_TUO_URL_DI_GOOGLE_APPS_SCRIPT';
+
         let cart = [];
         let total = 0;
 
+        // Funzione per inviare i dati a Google Sheets
+        function sendTracking(eventName, detail = '', price = '') {
+            if (!TRACKING_URL || TRACKING_URL.includes('INCOLLA_QUI')) return;
+
+            fetch(TRACKING_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    event: eventName,
+                    detail: detail,
+                    price: price
+                })
+            }).catch(err => console.error('Errore tracking:', err));
+        }
+
+        // Registra automaticamente la visita della pagina all'apertura
+        window.addEventListener('DOMContentLoaded', () => {
+            sendTracking('Visita Pagina', window.location.href);
+        });
+
+        // Gestione Aggiunta al Carrello + Tracciamento
         function addToCart(productName, price) {
-            // Aggiunge l'elemento all'array carrello
             cart.push({ name: productName, price: price });
-            
-            // Aggiorna il totale
             total += price;
 
-            // Aggiorna l'interfaccia utente (DOM)
             document.getElementById('cart-count').innerText = cart.length;
             document.getElementById('cart-total').innerText = total.toFixed(2);
 
-            // Feedback visivo rapido
+            // Invia l'evento "Aggiunta al Carrello" a Google Sheets
+            sendTracking('Aggiunta al Carrello', productName, price);
+
             alert(`"${productName}" è stato aggiunto al carrello!`);
         }
     </script>
