@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Store Virtuale - Offerte Esclusive</title>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css"/>
-
     <style>
         /* --- RESET E STILI BASE --- */
         * {
@@ -93,12 +90,11 @@
             transform: translateY(-5px);
         }
 
-        /* --- STILE IMMAGINI CORRETTO --- */
         .product-img {
             width: 100%;
             height: 220px;
-            object-fit: contain; /* Mostra l'immagine intera senza tagliarla */
-            background-color: #fafafa; /* Sfondo neutro per riempire eventuali spazi bianchi */
+            object-fit: contain;
+            background-color: #fafafa;
             padding: 10px;
             border-top-left-radius: 10px;
             border-top-right-radius: 10px;
@@ -121,7 +117,6 @@
             margin-bottom: 1rem;
         }
 
-        /* --- PULSANTI SPECIFICHE TECNICHE E SIMILAR PRODUCTS --- */
         .btn-details, .btn-similar {
             display: block;
             width: 100%;
@@ -160,7 +155,79 @@
             background-color: #57606f;
         }
 
-        /* --- FOOTER --- */
+        /* --- STILI MODALE GALLERIA --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 85%;
+            text-align: center;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+            object-fit: contain;
+            background: #fff;
+            padding: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .nav-btn {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 12px 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            border-radius: 50%;
+            background-color: rgba(0,0,0,0.6);
+            user-select: none;
+            border: none;
+            z-index: 1001;
+        }
+
+        .nav-btn:hover { background-color: rgba(0,0,0,0.9); }
+        .prev-btn { left: -60px; }
+        .next-btn { right: -60px; }
+
+        @media (max-width: 600px) {
+            .prev-btn { left: 10px; }
+            .next-btn { right: 10px; }
+        }
+
+        .modal-caption {
+            color: #fff;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
         footer {
             text-align: center;
             padding: 2rem;
@@ -200,7 +267,7 @@
                 <h2 class="product-title">Smartwatch Sport</h2>
                 <div class="product-price">€ 199.50</div>
                 
-                <button type="button" class="btn-similar" onclick="openSimilarProducts()">
+                <button type="button" class="btn-similar" onclick="openGallery()">
                     🖼️ Similar products
                 </button>
 
@@ -225,11 +292,20 @@
         </div>
     </main>
 
+    <!-- STRUTTURA DELLA GALLERIA MODALE -->
+    <div id="galleryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGallery()">&times;</span>
+            <button class="nav-btn prev-btn" onclick="changeImage(-1)">&#10094;</button>
+            <img id="modalImg" src="smartwatch.jpg" alt="Prodotto">
+            <button class="nav-btn next-btn" onclick="changeImage(1)">&#10095;</button>
+            <div id="modalCaption" class="modal-caption">Smartwatch Sport - Vista Principale</div>
+        </div>
+    </div>
+
     <footer>
         <p>&copy; 2026 TechStore. Tutti i diritti riservati.</p>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
 
     <script>
         const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzDjpCzNVOBag47uzFnb8AH_rYQ-Vkz3J7xQY_5L3HkfyMqyoLVo4D_V3Bd3HBcVgqoow/exec';
@@ -237,8 +313,15 @@
         let cart = [];
         let total = 0;
         let startTime = Date.now();
-
         let userId = 'USR-' + Math.random().toString(36).substring(2, 9);
+
+        // Nomi esatti dei file verificati dal repository GitHub
+        const galleryImages = [
+            { src: 'smartwatch.jpg', caption: 'Smartwatch Sport - Vista Principale' },
+            { src: 'smartwatch_2.jpg', caption: 'Smartwatch Sport - Immagine 2' },
+            { src: 'smartwatch_3.jpg', caption: 'Smartwatch Sport - Immagine 3' }
+        ];
+        let currentImgIndex = 0;
 
         function sendTracking(eventName, productName = '', productPrice = '') {
             let sessionDuration = Math.round((Date.now() - startTime) / 1000) + 's';
@@ -273,20 +356,46 @@
             document.getElementById('cart-total').innerText = total.toFixed(2);
 
             sendTracking('AddToCart', productName, price);
-
             alert(`"${productName}" è stato aggiunto al carrello!`);
         }
 
-        /* --- FUNZIONE APERTURA GALLERIA "SIMILAR PRODUCTS" --- */
-        function openSimilarProducts() {
+        /* --- LOGICA GALLERIA --- */
+        function openGallery() {
+            currentImgIndex = 0;
+            updateModalImage();
+            const modal = document.getElementById('galleryModal');
+            modal.style.display = 'flex';
             sendTracking('ViewSimilarProducts', 'Smartwatch Sport');
-            
-            Fancybox.show([
-                { src: "smartwatch.jpg", caption: "Smartwatch Sport - Modello Base" },
-                { src: "smartwatch_2.jpg", caption: "Smartwatch Sport - Variante 2" },
-                { src: "smartwatch_3.jpg", caption: "Smartwatch Sport - Variante 3" }
-            ]);
         }
+
+        function closeGallery() {
+            document.getElementById('galleryModal').style.display = 'none';
+        }
+
+        function changeImage(direction) {
+            currentImgIndex += direction;
+            if (currentImgIndex < 0) {
+                currentImgIndex = galleryImages.length - 1;
+            } else if (currentImgIndex >= galleryImages.length) {
+                currentImgIndex = 0;
+            }
+            updateModalImage();
+        }
+
+        function updateModalImage() {
+            const imgElement = document.getElementById('modalImg');
+            const captionElement = document.getElementById('modalCaption');
+            
+            imgElement.src = galleryImages[currentImgIndex].src;
+            captionElement.innerText = galleryImages[currentImgIndex].caption;
+        }
+
+        // Chiudi cliccando fuori dall'immagine
+        document.getElementById('galleryModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeGallery();
+            }
+        });
     </script>
 
 </body>
