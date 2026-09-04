@@ -1,4 +1,313 @@
-<script>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Virtuale - Offerte Esclusive</title>
+    <style>
+        /* --- RESET E STILI BASE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* --- HEADER E NAVIGAZIONE --- */
+        header {
+            background-color: #1a1a1a;
+            color: #fff;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .cart-status {
+            background-color: #ff4757;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: #fff;
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- SEZIONE PRODOTTI --- */
+        .products-container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 220px;
+            object-fit: contain;
+            background-color: #fafafa;
+            padding: 10px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: block;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            color: #2ed573;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .btn-details, .btn-similar {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: #ffffff;
+            color: #2c3e50;
+            border: 2px solid #2c3e50;
+            padding: 0.6rem;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-decoration: none;
+            margin-bottom: 0.6rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-details:hover, .btn-similar:hover {
+            background-color: #2c3e50;
+            color: #ffffff;
+        }
+
+        .btn-add-cart {
+            width: 100%;
+            background-color: #2f3542;
+            color: #fff;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-add-cart:hover {
+            background-color: #57606f;
+        }
+
+        /* --- STILI MODALE GALLERIA --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 85%;
+            text-align: center;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+            object-fit: contain;
+            background: #fff;
+            padding: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            color: #fff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .nav-btn {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            padding: 12px 16px;
+            color: white;
+            font-weight: bold;
+            font-size: 24px;
+            border-radius: 50%;
+            background-color: rgba(0,0,0,0.6);
+            user-select: none;
+            border: none;
+            z-index: 1001;
+        }
+
+        .nav-btn:hover { background-color: rgba(0,0,0,0.9); }
+        .prev-btn { left: -60px; }
+        .next-btn { right: -60px; }
+
+        @media (max-width: 600px) {
+            .prev-btn { left: 10px; }
+            .next-btn { right: 10px; }
+        }
+
+        .modal-caption {
+            color: #fff;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background-color: #1a1a1a;
+            color: #aaa;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">TechStore</div>
+        <div class="cart-status">
+            Carrello: <span id="cart-count">0</span> | €<span id="cart-total">0.00</span>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Nuova Collezione 2026</h1>
+        <p>Scopri i dispositivi tecnologici più innovativi selezionati per te con spedizione gratuita su tutti gli ordini.</p>
+    </section>
+
+    <main class="products-container">
+        <div class="product-card">
+            <img src="cuffie.jpg" alt="Cuffie Wireless Pro" class="product-img">
+            <div class="product-info">
+                <h2 class="product-title">Cuffie Wireless Pro</h2>
+                <div class="product-price">€ 129.99</div>
+                <button class="btn-add-cart" onclick="addToCart('Cuffie Wireless Pro', 129.99)">Aggiungi al Carrello</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="smartwatch.jpg" alt="Smartwatch Sport" class="product-img">
+            <div class="product-info">
+                <h2 class="product-title">Smartwatch Sport</h2>
+                <div class="product-price">€ 199.50</div>
+                
+                <button type="button" class="btn-similar" onclick="openGallery()">
+                    🖼️ Similar products
+                </button>
+
+                <a href="https://www.sectornolimits.com/orologio-sector-s-07-r3253552001-P52835.htm" 
+                   target="_blank" 
+                   rel="noopener noreferrer" 
+                   class="btn-details">
+                    📋 Specifiche Tecniche
+                </a>
+                
+                <button class="btn-add-cart" onclick="addToCart('Smartwatch Sport', 199.50)">Aggiungi al Carrello</button>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="speaker.jpg" alt="Altoparlante Bluetooth" class="product-img">
+            <div class="product-info">
+                <h2 class="product-title">Altoparlante Bluetooth</h2>
+                <div class="product-price">€ 79.00</div>
+                <button class="btn-add-cart" onclick="addToCart('Altoparlante Bluetooth', 79.00)">Aggiungi al Carrello</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- STRUTTURA DELLA GALLERIA MODALE -->
+    <div id="galleryModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeGallery()">&times;</span>
+            <button class="nav-btn prev-btn" onclick="changeImage(-1)">&#10094;</button>
+            <img id="modalImg" src="smartwatch.jpg" alt="Prodotto">
+            <button class="nav-btn next-btn" onclick="changeImage(1)">&#10095;</button>
+            <div id="modalCaption" class="modal-caption">Smartwatch Sport - Vista Principale</div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 TechStore. Tutti i diritti riservati.</p>
+    </footer>
+
+    <script>
         const TRACKING_URL = 'https://script.google.com/macros/s/AKfycbzDjpCzNVOBag47uzFnb8AH_rYQ-Vkz3J7xQY_5L3HkfyMqyoLVo4D_V3Bd3HBcVgqoow/exec';
 
         let cart = [];
@@ -16,7 +325,7 @@
             return val;
         }
 
-        // Cerca l'ID tra le possibili chiavi nell'URL
+        // Recupera l'ID tra le possibili varianti nell'URL
         let urlUserId = getQueryParam('user_id') || getQueryParam('uid') || getQueryParam('userId') || getQueryParam('id');
 
         let userId;
@@ -29,7 +338,7 @@
             userId = 'USR-' + Math.random().toString(36).substring(2, 9);
         }
 
-        console.log("ID Utente utilizzato per il tracciamento:", userId);
+        console.log("ID Utente tracciato:", userId);
 
         // Nomi esatti dei file verificati dal repository GitHub
         const galleryImages = [
@@ -48,7 +357,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     userId: userId,
-                    user_id: userId, // Inviato con entrambe le notazioni per compatibilità
+                    user_id: userId,
                     event: eventName,
                     productName: productName,
                     expenditure: productPrice,
@@ -114,3 +423,6 @@
             }
         });
     </script>
+
+</body>
+</html>
